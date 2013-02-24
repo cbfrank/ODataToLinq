@@ -87,7 +87,7 @@
         /// <returns>The OData expression converted to Dynamic Linq expression.</returns>
         private static string ParseExpression(string expression, ICollection<object> values)
         {
-            var splitExpression = expression.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var splitExpression = expression.Split(new[] { ' ' }, 3, StringSplitOptions.RemoveEmptyEntries);
             if (splitExpression.Length == 3)
             {
                 var leftPart = splitExpression[0];

@@ -16,42 +16,51 @@
         }
 
         private readonly List<Dummy> _dummies = new List<Dummy>
-        #region dummy data
+            #region dummy data
+
             {
                 new Dummy
-                {
-                    Id = 1,
-                    Name = "Aa",
-                    Active = false
-                },
+                    {
+                        Id = 1,
+                        Name = "Aa",
+                        Active = false
+                    },
                 new Dummy
-                {
-                    Id = 2,
-                    Name = "Bb",
-                    Active = true
+                    {
+                        Id = 2,
+                        Name = "Bb",
+                        Active = true
 
-                },
+                    },
                 new Dummy
-                {
-                    Id = 3,
-                    Name = "Cc",
-                    Active = false
+                    {
+                        Id = 3,
+                        Name = "Cc",
+                        Active = false
 
-                }
+                    },
+                new Dummy
+                    {
+                        Id = 4,
+                        Name = "D d",
+                        Active = true
+
+                    }
             };
+
         #endregion
 
         [TestMethod]
         public void FilterExpressionParser_BoolTrueEqual_Success()
         {
             // Prepare
-            var expected = _dummies.Single(d => d.Active);
+            var expected = _dummies.FirstOrDefault(d => d.Active);
 
             // Act
             var actual = FilterExpressionParser.Parse(_dummies.AsQueryable(), "(Active eq true)").ToList();
 
             // Assert
-            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual(2, actual.Count);
             Assert.AreEqual(expected, actual[0]);
         }
 
@@ -89,13 +98,13 @@
         public void FilterExpressionParser_BoolFalseNotEqual_Success()
         {
             // Prepare
-            var expected = _dummies.Single(d => d.Active);
+            var expected = _dummies.FirstOrDefault(d => d.Active);
 
             // Act
             var actual = FilterExpressionParser.Parse(_dummies.AsQueryable(), "(Active ne false)").ToList();
 
             // Assert
-            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual(2, actual.Count);
             Assert.AreEqual(expected, actual[0]);
         }
 
@@ -123,7 +132,7 @@
             var actual = FilterExpressionParser.Parse(_dummies.AsQueryable(), "(Name ne 'Bb')").ToList();
 
             // Assert
-            Assert.AreEqual(2, actual.Count);
+            Assert.AreEqual(3, actual.Count);
             Assert.AreEqual(expected[0], actual[0]);
             Assert.AreEqual(expected[1], actual[1]);
         }
@@ -132,12 +141,14 @@
         public void FilterExpressionParser_StringWithSpaceEqual_Success()
         {
             // Prepare
+            var expected = _dummies.Single(d => d.Name == "D d");
 
             // Act
-            //var actual = FilterExpressionParser.Parse(_dummies.AsQueryable(), "(Name eq 'B b')").ToList();
+            var actual = FilterExpressionParser.Parse(_dummies.AsQueryable(), "(Name eq 'D d')").ToList();
 
             // Assert
-            //Assert.AreEqual(0, actual.Count);
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual(expected, actual[0]);
         }
 
         [TestMethod]
@@ -164,7 +175,7 @@
             var actual = FilterExpressionParser.Parse(_dummies.AsQueryable(), "(Id ne 2)").ToList();
 
             // Assert
-            Assert.AreEqual(2, actual.Count);
+            Assert.AreEqual(3, actual.Count);
             Assert.AreEqual(expected[0], actual[0]);
             Assert.AreEqual(expected[1], actual[1]);
         }
@@ -179,7 +190,7 @@
             var actual = FilterExpressionParser.Parse(_dummies.AsQueryable(), "(Id gt 1)").ToList();
 
             // Assert
-            Assert.AreEqual(2, actual.Count);
+            Assert.AreEqual(3, actual.Count);
             Assert.AreEqual(expected[0], actual[0]);
             Assert.AreEqual(expected[1], actual[1]);
         }
@@ -194,7 +205,7 @@
             var actual = FilterExpressionParser.Parse(_dummies.AsQueryable(), "(Id ge 2)").ToList();
 
             // Assert
-            Assert.AreEqual(2, actual.Count);
+            Assert.AreEqual(3, actual.Count);
             Assert.AreEqual(expected[0], actual[0]);
             Assert.AreEqual(expected[1], actual[1]);
         }
@@ -265,7 +276,9 @@
             var expected = _dummies.Where(d => (d.Id == 1 && d.Name == "Aa") || d.Name == "Bb").ToList();
 
             // Act
-            var actual = FilterExpressionParser.Parse(_dummies.AsQueryable(), "((Id eq 1) and (Name eq 'Aa')) or (Name eq 'Bb')").ToList();
+            var actual =
+                FilterExpressionParser.Parse(_dummies.AsQueryable(), "((Id eq 1) and (Name eq 'Aa')) or (Name eq 'Bb')")
+                                      .ToList();
 
             // Assert
             Assert.AreEqual(2, actual.Count);
@@ -280,7 +293,9 @@
             var expected = _dummies.Where(d => d.Name == "Bb" || (d.Id == 1 && d.Name == "Aa")).ToList();
 
             // Act
-            var actual = FilterExpressionParser.Parse(_dummies.AsQueryable(), "(Name eq 'Bb') or ((Id eq 1) and (Name eq 'Aa'))").ToList();
+            var actual =
+                FilterExpressionParser.Parse(_dummies.AsQueryable(), "(Name eq 'Bb') or ((Id eq 1) and (Name eq 'Aa'))")
+                                      .ToList();
 
             // Assert
             Assert.AreEqual(2, actual.Count);
@@ -323,27 +338,12 @@
             var expected = _dummies.Single(d => d.Name.Contains("B"));
 
             // Act
-            var actual = FilterExpressionParser.Parse(_dummies.AsQueryable(), "(substringof(Name,'B') eq true)").ToList();
+            var actual =
+                FilterExpressionParser.Parse(_dummies.AsQueryable(), "(substringof(Name,'B') eq true)").ToList();
 
             // Assert
             Assert.AreEqual(1, actual.Count);
             Assert.AreEqual(expected, actual[0]);
         }
-
-
-        [TestMethod]
-        public void DummyTest()
-        {
-            // Prepare
-            var expected = _dummies.Single(d => d.Name == "Bb");
-
-            // Act
-            var actual = FilterExpressionParser.Parse(_dummies.AsQueryable(), "(Name eq 'B b')").ToList();
-
-            // Assert
-            Assert.AreEqual(1, actual.Count);
-            Assert.AreEqual(expected, actual[0]);
-        }
-    
     }
 }
