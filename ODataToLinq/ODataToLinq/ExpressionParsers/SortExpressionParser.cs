@@ -1,7 +1,7 @@
 ﻿namespace ODataToLinq.ExpressionParsers
 {
     using System.Linq;
-    using System.Linq.Dynamic;
+    using System.Linq.Dynamic.Core;
 
     public static class SortExpressionParser
     {
